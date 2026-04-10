@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taegis XDR — Training Dashboard</title>
+<style>
+  :root {
+    --blue:#1B3A6B;--blue-mid:#2980B9;--blue-light:#E6F1FB;--blue-200:#85B7EB;
+    --teal-light:#E1F5EE;--teal-dark:#085041;
+    --amber-light:#FAEEDA;--amber-dark:#633806;
+    --purple-light:#EEEDFE;--purple-dark:#3C3489;
+    --coral-light:#FAECE7;--coral-dark:#712B13;
+    --green:#1B5E20;--green-light:#E8F5E9;--green-mid:#2E7D32;
+    --red:#B71C1C;--red-light:#FFEBEE;
+    --gray-50:#F8FAFC;--gray-100:#F1F5F9;--gray-200:#E2E8F0;
+    --gray-300:#CBD5E1;--gray-400:#94A3B8;--gray-500:#64748B;
+    --gray-700:#334155;--gray-900:#0F172A;
+    --radius:8px;--radius-lg:12px;
+    --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F0F4F8;color:var(--gray-900);min-height:100vh}
+
+  /* NAV */
+  .nav{background:var(--blue);padding:0 28px;box-shadow:0 2px 8px rgba(0,0,0,.25);position:sticky;top:0;z-index:100}
+  .nav-inner{max-width:1200px;margin:0 auto;height:56px;display:flex;align-items:center;gap:14px}
+  .nav-logo{font-size:15px;font-weight:700;color:#fff;letter-spacing:.02em}
+  .nav-logo span{color:var(--blue-200);font-weight:400}
+  .nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .status-pill{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.8);background:rgba(255,255,255,.1);padding:5px 12px;border-radius:20px}
+  .dot{width:7px;height:7px;border-radius:50%;background:#4CAF50;flex-shrink:0}
+  .dot.spin{background:#FF9800;animation:blink .8s infinite}
+  .dot.err{background:#F44336}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+  .refresh-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:var(--radius);padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+  .refresh-btn:hover:not(:disabled){background:rgba(255,255,255,.22)}
+  .refresh-btn:disabled{opacity:.4;cursor:not-allowed}
+
+  /* LAYOUT */
+  .wrap{max-width:1200px;margin:0 auto;padding:24px 28px 60px}
+
+  /* STATS */
+  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
+  .stat{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:16px 18px;box-shadow:var(--shadow)}
+  .stat-lbl{font-size:11px;font-weight:500;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+  .stat-val{font-size:26px;font-weight:700;color:var(--gray-900);line-height:1}
+  .stat-sub{font-size:11px;color:var(--gray-400);margin-top:4px}
+
+  /* TABS */
+  .tabs{display:flex;border-bottom:1px solid var(--gray-200);margin-bottom:20px}
+  .tab{background:transparent;border:none;border-bottom:2.5px solid transparent;padding:10px 20px;font-size:13px;font-weight:500;color:var(--gray-500);cursor:pointer;transition:all .15s;margin-bottom:-1px}
+  .tab:hover{color:var(--gray-700)}
+  .tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+  .panel{display:none}.panel.active{display:block}
+
+  /* FILTERS */
+  .filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+  .filters select,.filters input{padding:7px 11px;border:1px solid var(--gray-200);border-radius:var(--radius);font-size:12px;background:#fff;color:var(--gray-700);outline:none;transition:border-color .15s}
+  .filters select:focus,.filters input:focus{border-color:var(--blue-mid)}
+  .filters input{flex:1;min-width:180px}
+  .rcount{font-size:12px;color:var(--gray-500);margin-left:auto;white-space:nowrap}
+  .csv-btn{background:var(--gray-100);border:1px solid var(--gray-200);border-radius:var(--radius);padding:7px 14px;font-size:12px;font-weight:500;color:var(--gray-700);cursor:pointer}
+  .csv-btn:hover{background:var(--gray-200)}
+
+  /* TABLE */
+  .card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--gray-200);box-shadow:var(--shadow);overflow:hidden}
+  .t-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--gray-50);padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--gray-200);white-space:nowrap}
+  td{padding:10px 14px;border-bottom:1px solid var(--gray-100);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover td{background:var(--gray-50)}
+
+  /* BADGES */
+  .badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
+  .pass{background:var(--green-light);color:var(--green)}
+  .fail{background:var(--red-light);color:var(--red)}
+  .tp{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}
+  .t1{background:var(--blue-light);color:var(--blue)}
+  .t2{background:var(--teal-light);color:var(--teal-dark)}
+  .t3{background:var(--amber-light);color:var(--amber-dark)}
+  .t4{background:var(--purple-light);color:var(--purple-dark)}
+  .t5{background:var(--coral-light);color:var(--coral-dark)}
+
+  /* MISC */
+  .cp{font-weight:500}.cs{font-size:11px;color:var(--gray-400);margin-top:2px}
+  .pw{display:flex;align-items:center;gap:8px;min-width:100px}
+  .pb{flex:1;height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden}
+  .pf{height:100%;border-radius:3px}
+  .ph{background:var(--green-mid)}.pm{background:#FF9800}.pl{background:var(--red)}.pz{background:var(--gray-200)}
+  .empty{text-align:center;padding:56px 24px}
+  .empty-icon{font-size:40px;margin-bottom:14px}
+  .empty-title{font-size:16px;font-weight:600;color:var(--gray-700);margin-bottom:8px}
+  .empty-sub{font-size:13px;color:var(--gray-500);line-height:1.6;max-width:420px;margin:0 auto}
+  .spinner{width:32px;height:32px;border:3px solid var(--gray-200);border-top-color:var(--blue);border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 14px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .ts{text-align:right;font-size:11px;color:var(--gray-400);margin-top:10px}
+  .footer{text-align:center;font-size:11px;color:var(--gray-400);margin-top:28px;padding-top:16px;border-top:1px solid var(--gray-200)}
+
+  @media(max-width:900px){
+    .stats{grid-template-columns:1fr 1fr}
+    .wrap{padding:16px}
+    .nav{padding:0 16px}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">TAEGIS XDR <span>Training Dashboard</span></div>
+    <div class="nav-right">
+      <div class="status-pill">
+        <div class="dot spin" id="dot"></div>
+        <span id="stxt">Connecting…</span>
+      </div>
+      <button class="refresh-btn" id="rbtn" onclick="load()" disabled>⟳ Refresh</button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="stats">
+    <div class="stat"><div class="stat-lbl">Total Submissions</div><div class="stat-val" id="s1">—</div><div class="stat-sub">quiz results received</div></div>
+    <div class="stat"><div class="stat-lbl">Unique Participants</div><div class="stat-val" id="s2">—</div><div class="stat-sub">completed ≥ 1 module</div></div>
+    <div class="stat"><div class="stat-lbl">Pass Rate</div><div class="stat-val" id="s3">—</div><div class="stat-sub">pass mark: 2/3 per module</div></div>
+    <div class="stat"><div class="stat-lbl">Modules Attempted</div><div class="stat-val" id="s4">—</div><div class="stat-sub">of 28 total</div></div>
+    <div class="stat"><div class="stat-lbl">Perfect Scores</div><div class="stat-val" id="s5">—</div><div class="stat-sub">modules scored 3/3</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="st('r',this)">📋 All Results</button>
+    <button class="tab" onclick="st('p',this)">👤 By Participant</button>
+    <button class="tab" onclick="st('m',this)">📚 By Module</button>
+  </div>
+
+  <!-- ALL RESULTS -->
+  <div class="panel active" id="panel-r">
+    <div class="filters">
+      <select id="ft" onchange="rr()">
+        <option value="">All Tracks</option>
+        <option>Track 1 — Administrator</option>
+        <option>Track 2 — Security Analyst</option>
+        <option>Track 3 — Advanced Search &amp; Hunting</option>
+        <option>Track 4 — Playbooks &amp; Automations</option>
+        <option>Track 5 — Custom Parsers</option>
+      </select>
+      <select id="fr" onchange="rr()">
+        <option value="">Pass &amp; Fail</option>
+        <option value="Pass">Pass only</option>
+        <option value="Fail">Fail only</option>
+      </select>
+      <input id="fn" placeholder="Search by name or module…" oninput="rr()">
+      <button class="csv-btn" onclick="csv()">⬇ Export CSV</button>
+      <span class="rcount" id="rc"></span>
+    </div>
+    <div class="card"><div class="t-wrap" id="tr"><div class="empty"><div class="spinner"></div><div class="empty-title">Loading…</div></div></div></div>
+  </div>
+
+  <!-- BY PARTICIPANT -->
+  <div class="panel" id="panel-p">
+    <div class="card"><div class="t-wrap" id="tp"></div></div>
+  </div>
+
+  <!-- BY MODULE -->
+  <div class="panel" id="panel-m">
+    <div class="card"><div class="t-wrap" id="tm"></div></div>
+  </div>
+
+  <div class="ts" id="ts"></div>
+  <div class="footer">Taegis XDR Training Programme · Admin Dashboard · Trainer Confidential</div>
+
+</div>
+
+<script>
+// ─── CONFIG ─────────────────────────────────────────────────────────────────
+// Replace with your READ-ONLY Airtable Personal Access Token
+const TOKEN = 'patSOm68gdM85dTW7.905dbbe26bf5bfdf734e83d54997e75328a9e649cb3fb9bfceebaefb2d67dc7c';
+const BASE  = 'appw6SfuLEc3Y8Lz5';
+const TABLE = 'tblCTQ6HCtAR05l7y';
+// ────────────────────────────────────────────────────────────────────────────
+
+let D = [], tab = 'r';
+const $ = id => document.getElementById(id);
+
+function setStatus(s, msg) {
+  $('dot').className = 'dot' + (s==='ok'?'':' '+s);
+  $('stxt').textContent = msg;
+}
+
+function fmt(iso) {
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) +
+           ' · ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  } catch(e) { return iso; }
+}
+
+function tc(t) { return 't'+(parseInt((t||'').match(/\d/)?.[0]||1)); }
+function ts2(t) {
+  return (t||'').replace('Track 1 — ','T1 · ').replace('Track 2 — ','T2 · ')
+    .replace('Track 3 — ','T3 · ').replace('Track 4 — ','T4 · ').replace('Track 5 — ','T5 · ');
+}
+function pfc(p) { return p>=70?'ph':p>=40?'pm':p>0?'pl':'pz'; }
+
+function st(t, el) {
+  tab = t;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  $('panel-'+t).classList.add('active');
+  if (t==='p') rp();
+  if (t==='m') rm();
+}
+
+async function load() {
+  $('rbtn').disabled = true;
+  setStatus('spin', 'Fetching from Airtable…');
+  try {
+    let recs = [], off = '';
+    do {
+      const url = `https://api.airtable.com/v0/${BASE}/${TABLE}?sort[0][field]=Submitted%20At&sort[0][direction]=desc` + (off?`&offset=${encodeURIComponent(off)}`:'');
+      const res = await fetch(url, { headers:{ 'Authorization':`Bearer ${TOKEN}` } });
+      if (res.status===401) { setStatus('err','Auth failed — check your token'); showErr(); return; }
+      if (!res.ok) { const e=await res.json().catch(()=>{}); setStatus('err','Error: '+(e?.error?.message||res.status)); showErr(); return; }
+      const d = await res.json();
+      recs = recs.concat(d.records||[]);
+      off = d.offset||'';
+    } while (off);
+
+    D = recs.map(r => ({
+      name:        r.fields['Participant Name']||'',
+      role:        r.fields['Role']||'',
+      moduleId:    r.fields['Module ID']||'',
+      modTitle:    r.fields['Module Title']||'',
+      track:       r.fields['Track']||'',
+      score:       r.fields['Score']??0,
+      total:       r.fields['Total Questions']??3,
+      result:      typeof r.fields['Result']==='object'?(r.fields['Result']?.name||''):(r.fields['Result']||''),
+      submittedAt: r.fields['Submitted At']||'',
+    }));
+
+    stats(); rr();
+    if (tab==='p') rp();
+    if (tab==='m') rm();
+    setStatus('ok', `Live · ${D.length} result${D.length!==1?'s':''} · Airtable connected`);
+    $('ts').textContent = 'Last refreshed: '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' IST';
+  } catch(e) {
+    setStatus('err', 'Network error');
+    $('tr').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Could not connect</div><div class="empty-sub">${e.message}</div></div>`;
+  } finally { $('rbtn').disabled = false; }
+}
+
+function showErr() {
+  $('tr').innerHTML = `<div class="empty"><div class="empty-icon">🔑</div><div class="empty-title">Authentication error</div><div class="empty-sub">Check that your Airtable token is correct and has read access to the Quiz Results table.</div></div>`;
+}
+
+function stats() {
+  const tot=D.length, ppl=new Set(D.map(r=>r.name.trim().toLowerCase())).size;
+  const pas=D.filter(r=>r.result==='Pass').length, mods=new Set(D.map(r=>r.moduleId)).size;
+  const perf=D.filter(r=>r.score===r.total).length;
+  $('s1').textContent=tot; $('s2').textContent=ppl;
+  $('s3').textContent=tot>0?Math.round(pas/tot*100)+'%':'—';
+  $('s4').textContent=mods+' / 28'; $('s5').textContent=perf;
+}
+
+function rr() {
+  const tf=$('ft').value, rf=$('fr').value, nf=$('fn').value.toLowerCase().trim();
+  const rows=D.filter(r=>(!tf||r.track===tf)&&(!rf||r.result===rf)&&(!nf||r.name.toLowerCase().includes(nf)||r.moduleId.toLowerCase().includes(nf)||r.modTitle.toLowerCase().includes(nf)));
+  $('rc').textContent=rows.length+' result'+(rows.length!==1?'s':'');
+  if (!rows.length) {
+    $('tr').innerHTML=`<div class="empty"><div class="empty-icon">${D.length===0?'📭':'🔍'}</div><div class="empty-title">${D.length===0?'No results yet':'No results match your filters'}</div><div class="empty-sub">${D.length===0?'Share the quiz HTML with your participants. Results will appear here automatically as they complete modules.':'Try adjusting your filters.'}</div></div>`;
+    return;
+  }
+  let h=`<table><thead><tr><th>#</th><th>Participant</th><th>Module</th><th>Track</th><th>Score</th><th>Result</th><th>Submitted</th></tr></thead><tbody>`;
+  rows.forEach((r,i)=>{
+    h+=`<tr>
+      <td style="color:var(--gray-400);font-size:12px">${i+1}</td>
+      <td><div class="cp">${r.name||'—'}</div><div class="cs">${r.role}</div></td>
+      <td><div class="cp">${r.moduleId}</div><div class="cs">${r.modTitle}</div></td>
+      <td><span class="tp ${tc(r.track)}">${ts2(r.track)}</span></td>
+      <td><strong style="font-size:14px">${r.score}/${r.total}</strong></td>
+      <td><span class="badge ${r.result==='Pass'?'pass':'fail'}">${r.result||'—'}</span></td>
+      <td style="font-size:12px;color:var(--gray-500)">${fmt(r.submittedAt)}</td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  $('tr').innerHTML=h;
+}
+
+function rp() {
+  const byP={};
+  D.forEach(r=>{ const k=r.name.trim().toLowerCase(); if(!byP[k]) byP[k]={name:r.name,role:r.role,results:[]}; byP[k].results.push(r); });
+  const ppl=Object.values(byP).sort((a,b)=>a.name.localeCompare(b.name));
+  if (!ppl.length) { $('tp').innerHTML=`<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">No participants yet</div><div class="empty-sub">Results will appear here as participants complete quiz modules.</div></div>`; return; }
+  let h=`<table><thead><tr><th>Participant</th><th>Modules Taken</th><th>Passed</th><th>Failed</th><th>Pass Rate</th><th>Coverage</th><th>Last Active</th></tr></thead><tbody>`;
+  ppl.forEach(p=>{
+    const tak=p.results.length, pas=p.results.filter(r=>r.result==='Pass').length;
+    const fai=tak-pas, pct=tak>0?Math.round(pas/tak*100):0, cov=Math.round(tak/28*100);
+    const lat=p.results.reduce((a,b)=>a.submittedAt>b.submittedAt?a:b,p.results[0]);
+    h+=`<tr>
+      <td><div class="cp">${p.name}</div><div class="cs">${p.role}</div></td>
+      <td><strong>${tak}</strong> of 28</td>
+      <td style="color:var(--green-mid);font-weight:600">${pas}</td>
+      <td style="color:${fai>0?'var(--red)':'var(--gray-400)'};font-weight:600">${fai}</td>
+      <td><span class="badge ${pct>=67?'pass':'fail'}">${pct}%</span></td>
+      <td><div class="pw"><div class="pb"><div class="pf ${pfc(cov)}" style="width:${cov}%"></div></div><span class="cs">${tak}/28</span></div></td>
+      <td style="font-size:12px;color:var(--gray-500)">${fmt(lat?.submittedAt)}</td>
+    </tr>`;
+  });
+  h+='</tbody></table>'; $('tp').innerHTML=h;
+}
+
+function rm() {
+  const byM={};
+  D.forEach(r=>{ if(!byM[r.moduleId]) byM[r.moduleId]={id:r.moduleId,title:r.modTitle,track:r.track,results:[]}; byM[r.moduleId].results.push(r); });
+  const mods=Object.values(byM).sort((a,b)=>a.id.localeCompare(b.id));
+  if (!mods.length) { $('tm').innerHTML=`<div class="empty"><div class="empty-icon">📚</div><div class="empty-title">No module data yet</div><div class="empty-sub">Module statistics will appear here once participants start submitting results.</div></div>`; return; }
+  let h=`<table><thead><tr><th>Module</th><th>Track</th><th>Attempts</th><th>Passed</th><th>Failed</th><th>Pass Rate</th><th>Avg Score</th></tr></thead><tbody>`;
+  mods.forEach(m=>{
+    const att=m.results.length, pas=m.results.filter(r=>r.result==='Pass').length;
+    const fai=att-pas, pct=att>0?Math.round(pas/att*100):0;
+    const avg=att>0?(m.results.reduce((s,r)=>s+(r.score||0),0)/att).toFixed(1):'—';
+    h+=`<tr>
+      <td><div class="cp">${m.id}</div><div class="cs">${m.title}</div></td>
+      <td><span class="tp ${tc(m.track)}">${ts2(m.track)}</span></td>
+      <td>${att}</td>
+      <td style="color:var(--green-mid);font-weight:600">${pas}</td>
+      <td style="color:${fai>0?'var(--red)':'var(--gray-400)'};font-weight:600">${fai}</td>
+      <td><div class="pw"><div class="pb"><div class="pf ${pfc(pct)}" style="width:${pct}%"></div></div><span class="cs">${pct}%</span></div></td>
+      <td><strong>${avg}</strong><span class="cs">/3</span></td>
+    </tr>`;
+  });
+  h+='</tbody></table>'; $('tm').innerHTML=h;
+}
+
+function csv() {
+  if (!D.length) { alert('No data to export yet.'); return; }
+  let c='Participant Name,Role,Module ID,Module Title,Track,Score,Total,Result,Submitted At\n';
+  D.forEach(r=>{ c+=`"${r.name}","${r.role}","${r.moduleId}","${r.modTitle}","${r.track}",${r.score},${r.total},"${r.result}","${r.submittedAt}"\n`; });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));
+  a.download=`Taegis_Results_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+load();
+</script>
+</body>
+</html>
