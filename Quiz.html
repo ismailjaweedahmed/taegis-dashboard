@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taegis XDR — Knowledge Quiz</title>
+<style>
+  /* ── CONFIG BANNER ─────────────────────────────── */
+  .config-banner{background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:#856404;display:none}
+  .config-banner.show{display:block}
+  .config-banner strong{display:block;margin-bottom:4px}
+  :root{--blue:#1B3A6B;--blue-mid:#2980B9;--blue-light:#E6F1FB;--blue-200:#85B7EB;--teal:#0F6E56;--teal-light:#E1F5EE;--teal-200:#5DCAA5;--amber:#854F0B;--amber-light:#FAEEDA;--amber-200:#EF9F27;--coral:#993C1D;--coral-light:#FAECE7;--coral-200:#F0997B;--purple:#534AB7;--purple-light:#EEEDFE;--purple-200:#AFA9EC;--green:#2e7d32;--green-light:#e8f5e9;--red:#b71c1c;--red-light:#ffebee;--gray-50:#F8F9FA;--gray-100:#F1F3F5;--gray-200:#E9ECEF;--gray-300:#DEE2E6;--gray-500:#6C757D;--gray-700:#495057;--gray-900:#212529;--radius:8px;--radius-lg:12px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F0F4F8;color:var(--gray-900);min-height:100vh}
+  /* ── TOP BAR ── */
+  .topbar{background:var(--blue);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .topbar-inner{max-width:780px;margin:0 auto;display:flex;align-items:center;height:54px;gap:12px}
+  .logo{font-size:14px;font-weight:700;color:#fff;letter-spacing:.02em}
+  .logo span{color:var(--blue-200);font-weight:400}
+  .progress-chip{margin-left:auto;font-size:11px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.1);padding:4px 10px;border-radius:20px;white-space:nowrap}
+  /* ── WRAP ── */
+  .app{max-width:780px;margin:0 auto;padding:24px 16px 80px}
+  /* ── STEP: WELCOME ── */
+  .welcome-card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--gray-200);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+  .welcome-hero{background:var(--blue);padding:32px 32px 28px;color:#fff}
+  .welcome-hero h1{font-size:22px;font-weight:700;margin-bottom:6px}
+  .welcome-hero p{font-size:14px;color:rgba(255,255,255,.75);line-height:1.5}
+  .welcome-body{padding:28px 32px}
+  .field-group{margin-bottom:18px}
+  .field-label{font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:6px;display:block;letter-spacing:.02em}
+  .field-input{width:100%;padding:10px 14px;border:1.5px solid var(--gray-300);border-radius:var(--radius);font-size:14px;outline:none;transition:border-color .15s;background:#fff;color:var(--gray-900)}
+  .field-input:focus{border-color:var(--blue-mid)}
+  select.field-input{cursor:pointer}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+  .info-card{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);padding:12px 14px}
+  .info-card .ic-val{font-size:20px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .info-card .ic-lbl{font-size:11px;color:var(--gray-500)}
+  .btn-start{width:100%;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);padding:13px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:4px}
+  .btn-start:hover{background:#15305a}
+  /* ── TRACK SELECTOR ── */
+  .section-label{font-size:11px;font-weight:700;color:var(--gray-500);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+  .track-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+  .track-btn{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:12px 14px;cursor:pointer;text-align:left;transition:all .15s}
+  .track-btn:hover{border-color:var(--blue-200);background:var(--blue-light)}
+  .track-btn.active{border-color:var(--blue);background:var(--blue-light)}
+  .tb-icon{font-size:18px;margin-bottom:6px}
+  .tb-name{font-size:12px;font-weight:600;color:var(--gray-900);line-height:1.3}
+  .tb-count{font-size:11px;color:var(--gray-500);margin-top:2px}
+  /* ── MODULE LIST ── */
+  .module-list{display:flex;flex-direction:column;gap:6px;margin-bottom:24px}
+  .mod-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);cursor:pointer;transition:all .15s}
+  .mod-item:hover{border-color:var(--blue-200);background:var(--blue-light)}
+  .mod-item.done{background:var(--green-light);border-color:#a5d6a7}
+  .mod-id-badge{font-size:10px;font-weight:700;padding:3px 7px;border-radius:4px;letter-spacing:.04em;white-space:nowrap}
+  .mod-item-title{font-size:13px;font-weight:500;flex:1}
+  .mod-score{font-size:11px;font-weight:700;margin-left:auto;white-space:nowrap}
+  .mod-score.pass{color:var(--green)}
+  .mod-score.fail{color:var(--red)}
+  /* ── QUIZ ── */
+  .quiz-topbar{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .back-btn{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:6px 12px;font-size:12px;cursor:pointer;color:var(--gray-700);transition:all .15s}
+  .back-btn:hover{background:var(--gray-100)}
+  .quiz-mod-title{font-size:16px;font-weight:700;color:var(--gray-900)}
+  .quiz-mod-sub{font-size:12px;color:var(--gray-500);margin-top:2px}
+  .prog-bar{height:4px;background:var(--gray-200);border-radius:2px;margin-bottom:20px}
+  .prog-fill{height:100%;background:var(--blue-mid);border-radius:2px;transition:width .3s}
+  .q-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:24px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .q-num{font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+  .q-text{font-size:15px;font-weight:500;color:var(--gray-900);line-height:1.55;margin-bottom:18px}
+  .options{display:flex;flex-direction:column;gap:8px}
+  .option{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius);cursor:pointer;transition:all .15s;font-size:13px;line-height:1.4}
+  .option:hover:not(.locked){border-color:var(--blue-200);background:var(--blue-light)}
+  .option.selected{border-color:var(--blue);background:var(--blue-light)}
+  .option.correct{border-color:var(--green);background:var(--green-light)}
+  .option.wrong{border-color:var(--red);background:var(--red-light)}
+  .opt-letter{width:22px;height:22px;border-radius:50%;background:var(--gray-100);border:1px solid var(--gray-300);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+  .option.selected .opt-letter{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .option.correct .opt-letter{background:var(--green);color:#fff;border-color:var(--green)}
+  .option.wrong .opt-letter{background:var(--red);color:#fff;border-color:var(--red)}
+  .explanation{margin-top:10px;padding:10px 12px;background:var(--gray-50);border-left:3px solid var(--blue-mid);border-radius:4px;font-size:12px;color:var(--gray-700);line-height:1.5;display:none}
+  .explanation.show{display:block}
+  .quiz-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:4px}
+  .btn{padding:9px 20px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+  .btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:#15305a}
+  .btn-secondary{background:#fff;color:var(--gray-700);border:1px solid var(--gray-300)}.btn-secondary:hover{background:var(--gray-100)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  /* ── RESULT ── */
+  .result-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:36px 24px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .result-score{font-size:56px;font-weight:800;line-height:1}
+  .result-badge{display:inline-block;font-size:13px;font-weight:600;padding:4px 14px;border-radius:20px;margin:10px 0 16px}
+  .result-badge.pass{background:var(--green-light);color:var(--green)}
+  .result-badge.fail{background:var(--red-light);color:var(--red)}
+  .result-msg{font-size:15px;font-weight:500;margin-bottom:6px}
+  .result-sub{font-size:13px;color:var(--gray-500)}
+  .submit-status{font-size:12px;color:var(--gray-500);margin:14px 0 0;min-height:18px}
+  .submit-status.ok{color:var(--green)}
+  .submit-status.err{color:var(--red)}
+  .result-actions{display:flex;justify-content:center;gap:10px;margin-top:20px}
+  /* ── TOAST ── */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gray-900);color:#fff;padding:10px 18px;border-radius:var(--radius);font-size:13px;z-index:999;opacity:0;transition:all .3s;pointer-events:none}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+  .toast.success{background:#2e7d32}
+  /* ── SCREENS ── */
+  .screen{display:none}.screen.active{display:block}
+</style>
+</head>
+<body>
+
+<!-- ── CONFIG BANNER (shown if token not set) ── -->
+<div class="config-banner" id="config-banner">
+  <strong>⚙️ Setup required — Airtable token missing</strong>
+  Open this file in a text editor, find the line <code>const AIRTABLE_TOKEN = ''</code> near the top of the &lt;script&gt; section, and paste your Airtable Personal Access Token between the quotes. Save and re-open the file.
+</div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="logo">TAEGIS XDR <span>Knowledge Quiz</span></div>
+    <div class="progress-chip" id="top-progress" style="display:none">0 / 26 modules complete</div>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- ══ SCREEN 1: WELCOME ══ -->
+  <div class="screen active" id="screen-welcome">
+    <div class="welcome-card">
+      <div class="welcome-hero">
+        <h1>Taegis XDR Knowledge Quiz</h1>
+        <p>27 modules · 81 questions · 3 questions per module · Pass mark 2/3<br>Your results are submitted automatically after each module.</p>
+      </div>
+      <div class="welcome-body">
+        <div class="field-group">
+          <label class="field-label">Your full name</label>
+          <input class="field-input" id="inp-name" type="text" placeholder="e.g. Sarah Ahmed" autocomplete="name">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Your role</label>
+          <input class="field-input" id="inp-role" type="text" placeholder="e.g. SOC Analyst L2" autocomplete="organization-title">
+        </div>
+        <div class="info-grid">
+          <div class="info-card"><div class="ic-val">27</div><div class="ic-lbl">Total modules</div></div>
+          <div class="info-card"><div class="ic-val">81</div><div class="ic-lbl">Total questions</div></div>
+          <div class="info-card"><div class="ic-val">2/3</div><div class="ic-lbl">Pass mark per module</div></div>
+          <div class="info-card"><div class="ic-val">5</div><div class="ic-lbl">Training tracks</div></div>
+        </div>
+        <button class="btn-start" onclick="startSession()">Begin Quiz →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 2: MODULE SELECTOR ══ -->
+  <div class="screen" id="screen-select">
+    <div style="margin-bottom:20px">
+      <div style="font-size:20px;font-weight:700;margin-bottom:4px" id="sel-greeting">Hi there!</div>
+      <div style="font-size:13px;color:var(--gray-500)">Pick a track, then select a module to begin. Your results save to Airtable after each module.</div>
+    </div>
+    <div class="section-label">Select track</div>
+    <div class="track-grid">
+      <button class="track-btn active" onclick="selectTrack('admin',this)"><div class="tb-icon">🛡</div><div class="tb-name">Track 1 — Administrator</div><div class="tb-count">6 modules</div></button>
+      <button class="track-btn" onclick="selectTrack('analyst',this)"><div class="tb-icon">🔍</div><div class="tb-name">Track 2 — Security Analyst</div><div class="tb-count">7 modules</div></button>
+      <button class="track-btn" onclick="selectTrack('search',this)"><div class="tb-icon">🔎</div><div class="tb-name">Track 3 — Advanced Search</div><div class="tb-count">4 modules</div></button>
+      <button class="track-btn" onclick="selectTrack('playbooks',this)"><div class="tb-icon">⚡</div><div class="tb-name">Track 4 — Playbooks</div><div class="tb-count">5 modules</div></button>
+      <button class="track-btn" onclick="selectTrack('parsers',this)"><div class="tb-icon">⚙️</div><div class="tb-name">Track 5 — Custom Parsers</div><div class="tb-count">5 modules</div></button>
+    </div>
+    <div class="section-label">Select module</div>
+    <div class="module-list" id="module-list"></div>
+  </div>
+
+  <!-- ══ SCREEN 3: QUIZ ══ -->
+  <div class="screen" id="screen-quiz">
+    <div class="quiz-topbar">
+      <button class="back-btn" onclick="goBack()">← Back</button>
+      <div><div class="quiz-mod-title" id="q-title"></div><div class="quiz-mod-sub" id="q-sub"></div></div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div id="q-container"></div>
+    <div class="quiz-actions">
+      <button class="btn btn-secondary" id="btn-prev" onclick="prevQ()" disabled>← Prev</button>
+      <button class="btn btn-primary" id="btn-next" onclick="nextQ()">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 4: RESULT ══ -->
+  <div class="screen" id="screen-result">
+    <div class="quiz-topbar">
+      <button class="back-btn" onclick="goBack()">← Back to modules</button>
+    </div>
+    <div class="result-card">
+      <div class="result-score" id="res-score"></div>
+      <div class="result-badge" id="res-badge"></div>
+      <div class="result-msg" id="res-msg"></div>
+      <div class="result-sub" id="res-sub"></div>
+      <div class="submit-status" id="submit-status">Submitting result to Airtable…</div>
+      <div class="result-actions">
+        <button class="btn btn-secondary" onclick="retake()">Retake</button>
+        <button class="btn btn-primary" onclick="goBack()">Next module →</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// ⚙️  CONFIGURATION — ADD YOUR AIRTABLE TOKEN BELOW
+// ══════════════════════════════════════════════════════════
+const AIRTABLE_TOKEN = 'patAZldiOuFBcitB6.6b219d817ec1327e66a1b29b7694c9fc7d781545f4f0399889627add77cfb576';   // ← Paste your Airtable Personal Access Token here
+
+// Airtable base & table IDs (pre-configured — do not change)
+const BASE_ID       = 'appw6SfuLEc3Y8Lz5';
+const RESULTS_TABLE = 'tblCTQ6HCtAR05l7y';
+
+// Field IDs in the Quiz Results table
+const F = {
+  resultId:   'fldIg1z0AQqgtAlNG',
+  name:       'fldEAXr4OpoytpfP6',
+  role:       'fldxXjSoLQus7Gf8p',
+  moduleId:   'fldOTh7GaxAOn5LTk',
+  modTitle:   'fldFxIxIwI38LmMTM',
+  track:      'fldDdNWwNTy3zIYh2',
+  score:      'fldQZGnjGqXWvWu4t',
+  total:      'fldLq0mohNgZDGbvc',
+  result:     'fldNKOwBKmuknrJgd',
+  submittedAt:'fldMEuJkZiZLuAw4L',
+};
+// ══════════════════════════════════════════════════════════
+
+// Check token on load
+window.addEventListener('DOMContentLoaded', () => {
+  if (!AIRTABLE_TOKEN) document.getElementById('config-banner').classList.add('show');
+});
+
+// ── ALL MODULE DATA ──────────────────────────────────────
+const TRACKS = {
+  admin:     { label:'Track 1 — Administrator',            icon:'🛡' },
+  analyst:   { label:'Track 2 — Security Analyst',         icon:'🔍' },
+  search:    { label:'Track 3 — Advanced Search & Hunting',icon:'🔎' },
+  playbooks: { label:'Track 4 — Playbooks & Automations',  icon:'⚡' },
+  parsers:   { label:'Track 5 — Custom Parsers',           icon:'⚙️' },
+};
+
+const MODULES = [
+  {id:'ADM-01',track:'admin',title:'Platform overview & navigation',questions:[
+    {q:'Which dashboard in Taegis XDR gives you a real-time view of filtered detections requiring triage?',opts:['Events Dashboard','Detection Triage Dashboard','Cases Overview','Asset Inventory'],ans:1,exp:'The Detection Triage Dashboard is specifically designed for filtering and triaging active detections in real time.'},
+    {q:'Where would an Administrator find in-platform access to Secureworks subject-matter experts for live guidance?',opts:['Settings menu','Release Notes panel','Ask an Expert feature','User Profile settings'],ans:2,exp:'Ask an Expert is the in-platform feature that provides 24x7 access to Secureworks SMEs via chat or support ticket.'},
+    {q:'Which navigation area in Taegis XDR is used to review and investigate created workflows related to security incidents?',opts:['Events','Assets','Cases','Integrations'],ans:2,exp:'The Cases section is where security incidents are created, assigned, investigated, and resolved as structured workflows.'},
+  ]},
+  {id:'ADM-02',track:'admin',title:'User management & roles',questions:[
+    {q:'Which Taegis XDR role provides read-only access to the entire application with no ability to manage users or take actions?',opts:['Analyst','Responder','Auditor','Administrator'],ans:2,exp:'The Auditor role has the most limited access — read-only across the platform, no management capabilities.'},
+    {q:'An Administrator has invited a new SOC analyst. What is the key capability the Analyst role CANNOT perform?',opts:['Investigate detections','Search for threats','Manage users','Recommend response actions'],ans:2,exp:'Analysts cannot manage users. User management is restricted to the Administrator role.'},
+    {q:'Which principle should guide role assignment in Taegis XDR?',opts:['All users should be Administrators for flexibility','Assign the most restrictive role suitable for each person','Responder role is the default for all new users','Roles should be based on seniority'],ans:1,exp:'The principle of least privilege means assigning the most restrictive role that still allows the person to perform their job function.'},
+  ]},
+  {id:'ADM-03',track:'admin',title:'SSO configuration',questions:[
+    {q:'Where in Taegis XDR is SSO enabled for the tenant?',opts:['Integration settings','Tenant settings panel','User management section','Notification preferences'],ans:1,exp:'SSO is enabled through the tenant settings panel in the Taegis XDR administration area.'},
+    {q:'Which identity providers are supported for Taegis XDR SSO configuration?',opts:['Only Okta','Only Azure AD','Azure AD and Okta among others','Only LDAP-based providers'],ans:2,exp:'Taegis XDR supports multiple identity providers including Azure AD, Okta, and others for SSO integration.'},
+    {q:'Before rolling SSO out to the entire team, what critical step should an Administrator complete?',opts:['Reset all user passwords','Test the SSO login flow','Export all user accounts','Disable MFA for all users'],ans:1,exp:'Testing the SSO login flow before team rollout ensures the identity provider integration is working correctly and prevents lockouts.'},
+  ]},
+  {id:'ADM-04',track:'admin',title:'Integration setup',questions:[
+    {q:'Which endpoint agent is used in this environment to capture DNS, IP, Process, and Windows/Linux log telemetry?',opts:['Red Cloak Agent','CrowdStrike Agent','Sophos Agent','Carbon Black Agent'],ans:2,exp:'In this environment, the Sophos Agent is deployed and captures telemetry including DNS, IP, Processes, and Windows/Linux Logs.'},
+    {q:'When forwarding syslog data from on-premises sources to Taegis XDR, which component is deployed on-premises?',opts:['Taegis Cloud Relay','XDR Collector (On-Premises Data Collector)','Sophos Agent','CTU Feed Manager'],ans:1,exp:'The XDR Collector (On-Premises Data Collector) is deployed on-premises to collect and forward syslog data to the Taegis XDR cloud.'},
+    {q:'Which AWS service integration does Taegis XDR use to ingest cloud security findings?',opts:['AWS CloudWatch','AWS GuardDuty','AWS Config','AWS Inspector'],ans:1,exp:'Taegis XDR integrates with AWS GuardDuty for cloud security findings, alongside CloudTrail, VPC Flow Logs, and WAF.'},
+  ]},
+  {id:'ADM-05',track:'admin',title:'Notification settings',questions:[
+    {q:'What type of notifications can be configured at tenant level in Taegis XDR to alert the team of new cases or detections?',opts:['SMS notifications only','Email notifications','In-app pop-ups only','Webhook-only alerts'],ans:1,exp:'Email notifications can be configured in Taegis XDR to trigger alerts for detections and cases at the tenant level.'},
+    {q:'What should be configured so that Taegis MDR analysts know whom to contact during an incident?',opts:['Asset tags','SSO provider settings','MDR escalation contacts','Proactive response policies'],ans:2,exp:'MDR escalation contacts define the people and procedures MDR analysts follow when escalating incidents to your organization.'},
+    {q:'After configuring notification settings, what is the recommended final step?',opts:['Archive all old notifications','Test notification delivery','Disable default alerts','Switch to webhook delivery'],ans:1,exp:'Testing notification delivery ensures that the configuration is working and that the right people receive alerts as expected.'},
+  ]},
+  {id:'ADM-06',track:'admin',title:'Proactive response configuration',questions:[
+    {q:'What is the primary benefit of enabling Proactive Response in Taegis MDR?',opts:['Reduces the number of detections generated','Allows MDR analysts to act on your behalf without waiting for approval','Automatically updates endpoint agents','Provides detailed forensic reports after an incident'],ans:1,exp:'Proactive Response enables MDR analysts to take containment or response actions immediately without waiting — reducing dwell time.'},
+    {q:'How are specific assets scoped for Proactive Response actions in Taegis XDR?',opts:['By IP address range','By user role','By asset tags','By integration type'],ans:2,exp:'Asset tags are used to define which assets MDR analysts are authorized to take Proactive Response actions on.'},
+    {q:'Which of the following is a valid Proactive Response action type in Taegis XDR?',opts:['Reset SSO configuration','Network Proactive Response','Restart the XDR Collector','Rebuild the tenant configuration'],ans:1,exp:'Taegis supports Endpoint, Cloud, and Network Proactive Response action types, each scoped to the relevant asset category.'},
+  ]},
+  {id:'ANA-01',track:'analyst',title:'Platform orientation for analysts',questions:[
+    {q:'What is the maximum data retention period in Taegis XDR for Advanced Search queries?',opts:['30 days','6 months','12 months','3 years'],ans:2,exp:'Taegis XDR retains data for 12 months, enabling analysts to search historical events for investigations and hunting.'},
+    {q:'Which best describes the relationship between an event and a detection in Taegis XDR?',opts:['They are identical — the terms are interchangeable','A detection is created when the platform identifies suspicious activity within ingested events','An event is always created after a detection','Detections are only created manually by analysts'],ans:1,exp:'Events are raw ingested log data. Detections are generated when suspicious or malicious patterns are identified within those events.'},
+    {q:'Where would an analyst primarily go to begin investigating an active security alert in Taegis XDR?',opts:['The Assets page','The Integrations page','Detections or Detection Triage Dashboard','The Notification settings'],ans:2,exp:'The Detections page and Detection Triage Dashboard are the primary starting points for analysts reviewing and triaging active alerts.'},
+  ]},
+  {id:'ANA-02',track:'analyst',title:'Understanding events & detections',questions:[
+    {q:'Which Taegis XDR detector uses behavioral analytics to identify multi-stage attack sequences across data sources?',opts:['Stolen Credentials Detector','Punycode Detector','Tactic Graphs Detector','DGA Detector'],ans:2,exp:'Tactic Graphs is Taegis XDR\'s core behavioral analytics detector, correlating activity across multiple data sources to identify multi-stage attack patterns.'},
+    {q:'What does the DGA (Domain Generation Algorithm) detector in Taegis XDR identify?',opts:['Attempts to brute-force user passwords','Malware using algorithmically generated domains for C2 communications','SQL injection attempts in web traffic','Lateral movement via RDP'],ans:1,exp:'The DGA Detector identifies malware that uses domain generation algorithms to communicate with C2 infrastructure — a common evasion technique.'},
+    {q:'How does Taegis XDR leverage the MITRE ATT&CK framework in its detections?',opts:['ATT&CK is only used for manual threat hunting','Detections are mapped to ATT&CK tactics and techniques to provide attack context','ATT&CK rules replace the built-in detectors','ATT&CK is only available in the Enterprise tier'],ans:1,exp:'Taegis XDR maps detections to MITRE ATT&CK tactics and techniques, giving analysts immediate context about the attack stage.'},
+  ]},
+  {id:'ANA-03',track:'analyst',title:'Detection triage workflow',questions:[
+    {q:'On the Detection Triage Dashboard, what does "resolving" a detection indicate?',opts:['The detection has been escalated to MDR','The detection has been reviewed and determined to be a false positive or not requiring action','The detection has been automatically remediated','The detection is being actively investigated in a case'],ans:1,exp:'Resolving a detection (Resolve Detection) indicates that an analyst has reviewed it and determined it does not require further investigation — it is the correct action in Taegis XDR, not "dismiss".'},
+    {q:'High-volume low-severity detections from a known scanning tool are creating noise. What triage capability should be used?',opts:['Create a case for each detection','Escalate all detections to MDR','Use suppression rules to reduce noise from known benign sources','Delete the integration generating the detections'],ans:2,exp:'Suppression rules allow analysts to reduce noise from known benign sources or recurring false positives.'},
+    {q:'Which triage action should be taken when a detection requires further investigation and team collaboration?',opts:['Resolve the detection','Assign it to a team member or create a case','Archive the detection','Reset the detection severity'],ans:1,exp:'Assigning the detection to a team member or creating a case is the appropriate action when further investigation and collaboration is needed.'},
+  ]},
+  {id:'ANA-04',track:'analyst',title:'Cases & investigations',questions:[
+    {q:'In Taegis XDR, what severity level typically triggers automatic case creation?',opts:['Low severity only','Low and Medium severity','Medium and High severity','High severity only'],ans:2,exp:'Automatic case creation is configured for medium severity and above (including custom detections), ensuring significant threats are automatically tracked.'},
+    {q:'When closing a case in Taegis XDR, what important step should an analyst complete?',opts:['Delete all associated detections','Document the resolution — findings, actions taken, and outcome','Re-open all resolved detections','Notify the integration team'],ans:1,exp:'Documenting the resolution is critical for post-incident review, compliance, and knowledge sharing within the team.'},
+    {q:'What information can analysts add within a Taegis XDR case to support the investigation?',opts:['Only status updates','Comments, evidence artifacts, and investigation notes','Only the final resolution verdict','Automated playbook results only'],ans:1,exp:'Cases support rich collaboration through comments, evidence attachments, and investigation notes — enabling the full team to contribute.'},
+  ]},
+  {id:'ANA-05',track:'analyst',title:'Threat intelligence & CTU feeds',questions:[
+    {q:'What does the CTU feed provide to Taegis XDR detections?',opts:['Additional user account permissions','Threat intelligence enrichment that adds context to detections and alerts','Raw firewall log data','Automated response scripts'],ans:1,exp:'The Secureworks CTU feed enriches Taegis XDR detections with threat intelligence, providing context such as known malicious IPs, domains, and actor attribution.'},
+    {q:'Who produces the threat intelligence that flows through the CTU feed in Taegis XDR?',opts:['The customer\'s internal threat intelligence team','Third-party commercial threat feeds only','Secureworks Counter Threat Unit (CTU)','MITRE Corporation'],ans:2,exp:'The CTU feed is produced by Secureworks\' Counter Threat Unit (CTU) — a dedicated team of threat intelligence researchers and analysts.'},
+    {q:'How does CTU feed data typically surface to an analyst during detection triage?',opts:['In a separate CTU dashboard only accessible to administrators','As enrichment context within detection details — e.g. known malicious actor attribution','Via a weekly PDF report','Only through the Ask an Expert chat'],ans:1,exp:'CTU enrichment appears directly within detection details, giving analysts immediate context such as known threat actor attribution and malicious indicator data.'},
+  ]},
+  {id:'ANA-06',track:'analyst',title:'Ask an expert',questions:[
+    {q:'What does the Ask an Expert feature in Taegis XDR provide?',opts:['Automated AI responses to security questions','24x7 access to Secureworks SMEs via chat or support ticket','A knowledge base of static articles','Access to raw CTU intelligence reports only'],ans:1,exp:'Ask an Expert connects analysts directly with Secureworks SMEs 24x7 via in-platform chat or support ticket for operational guidance.'},
+    {q:'When should an analyst use a support ticket rather than the Ask an Expert chat?',opts:['For all questions regardless of urgency','For issues requiring documentation, tracking, or follow-up over time','Only for billing enquiries','Chat is never available — only tickets are supported'],ans:1,exp:'Support tickets are better suited for issues requiring formal tracking, documentation, multi-step resolution, or escalation.'},
+    {q:'What best practice improves response quality when using Ask an Expert?',opts:['Keep the question as brief as possible with no details','Provide detailed context: what you observed, what you\'ve tried, and what you need','Always include your password for identity verification','Submit the query in the evening for faster response'],ans:1,exp:'Providing detailed context allows the SME to give a faster, more accurate and actionable response.'},
+  ]},
+  {id:'ANA-07',track:'analyst',title:'Response recommendations & escalation',questions:[
+    {q:'What does "isolating" an endpoint mean as a response action in Taegis XDR?',opts:['Permanently deleting the endpoint from the platform','Cutting the endpoint off from network access while preserving local investigation capability','Reinstalling the operating system on the endpoint','Transferring ownership of the endpoint to MDR analysts'],ans:1,exp:'Isolating an endpoint severs its network connectivity to prevent lateral movement or data exfiltration, while preserving the ability to investigate it locally.'},
+    {q:'When should an analyst escalate a case to Taegis MDR for response?',opts:['Only after attempting all response actions themselves and failing','When the incident is complex, high severity, or requires actions beyond the analyst\'s authorized scope','Never — MDR only handles new detections, not escalations','When the case has been open for more than 7 days'],ans:1,exp:'MDR escalation is appropriate when the incident is complex, high-severity, or requires actions beyond what the analyst is authorized to perform.'},
+    {q:'Where should an analyst document their recommended response action?',opts:['In the user profile notes section','In the detection\'s raw event log','Within the associated Case — as a comment or formal recommendation','In a separate email to the MDR team only'],ans:2,exp:'Response recommendations should be documented within the Case to ensure team visibility, maintain an audit trail, and enable MDR collaboration.'},
+  ]},
+  {id:'SRH-01',track:'search',title:'Advanced Search introduction',questions:[
+    {q:'What does the Taegis XDR "data lake" refer to in the context of Advanced Search?',opts:['A dedicated cloud storage bucket for backup files','The 12-month repository of all ingested and normalized event data searchable via Advanced Search','A separate analytics platform for executive reporting','The CTU threat intelligence database'],ans:1,exp:'The Taegis data lake is the 12-month repository of all normalized event data ingested from integrated sources, queryable via Advanced Search.'},
+    {q:'Which schema in Taegis XDR would you query to investigate user login activity?',opts:['Process schema','DNS schema','Auth schema','NetFlow schema'],ans:2,exp:'The Auth schema contains authentication event data — login attempts, successes, failures — making it the right target for investigating user login activity.'},
+    {q:'Which Taegis XDR feature provides the primary interface for querying the 12-month data lake?',opts:['The Detection Triage Dashboard','The Assets page','Advanced Search','The Cases overview'],ans:2,exp:'Advanced Search is the primary interface for querying the Taegis data lake, enabling analysts to write queries across all ingested and normalized event data.'},
+  ]},
+  {id:'SRH-02',track:'search',title:'Query language & syntax',questions:[
+    {q:'In the Taegis XDR Advanced Search query language, how are multiple conditions combined to narrow results?',opts:['Using comma separation only','Using logical operators AND, OR, NOT','Using plus signs between conditions','Using semicolons between field:value pairs'],ans:1,exp:'The Taegis query language uses AND, OR, and NOT as logical operators to combine multiple field:value conditions and refine search results.'},
+    {q:'Which aggregation function would you use in Advanced Search to count how many times a specific event occurred?',opts:['sum()','groupby()','count()','filter()'],ans:2,exp:'The count() aggregation function returns the number of matching records for a query — useful for quantifying how many times an event type occurred.'},
+    {q:'After building a useful query in Advanced Search, what should analysts do to make it available for future use?',opts:['Bookmark the browser page','Copy the query text into a Word document','Save and share the query within the platform','Export the results as a CSV only'],ans:2,exp:'Taegis XDR allows analysts to save and share queries within the platform, making them reusable for the team.'},
+  ]},
+  {id:'SRH-03',track:'search',title:'Schema & data normalization',questions:[
+    {q:'What is the purpose of schema normalization in Taegis XDR?',opts:['To compress log files for storage efficiency','To standardize raw logs from different sources into consistent, queryable data structures','To encrypt log data before storage','To translate all logs into English'],ans:1,exp:'Schema normalization transforms raw logs from diverse sources into standardized schemas, enabling consistent querying and detection across all data.'},
+    {q:'Which Taegis XDR schema would be most relevant when investigating C2 communication via unusual domain lookups?',opts:['Auth schema','Process schema','HTTP schema','DNS schema'],ans:3,exp:'The DNS schema captures domain resolution activity — the right starting point for investigating C2 communication via unusual or algorithmically generated domain lookups.'},
+    {q:'The Tactic Graphs detector in Taegis XDR can use data from which schemas?',opts:['Auth schema only','DNS and NetFlow only','Multiple schemas including Detections, Auth, Process, DNS, NetFlow, HTTP, and more','CloudAudit schema only'],ans:2,exp:'Tactic Graphs is a broad detector that correlates data across many schemas to identify multi-stage attack patterns.'},
+  ]},
+  {id:'SRH-05',track:'search',title:'Report creation & widgets',questions:[
+    {q:'What is the source data for custom reports and dashboard widgets created in Taegis XDR?',opts:['Only case data from closed investigations','Advanced Search query results across the 12-month data lake','Only CTU feed intelligence data','External threat feeds imported via API'],ans:1,exp:'Reports and widgets in Taegis XDR are built on Advanced Search query results, enabling analysts to surface any event data from the 12-month data lake.'},
+    {q:'Which use case is most appropriate for creating a recurring dashboard widget in Taegis XDR?',opts:['A one-time forensic investigation of a specific incident','Monitoring a metric that the team checks regularly — e.g. failed logins per day','Drafting an email to a stakeholder','Configuring a new data source integration'],ans:1,exp:'Dashboard widgets are ideal for recurring monitoring needs, providing always-current visibility without repeating queries manually.'},
+    {q:'How can Taegis XDR reports support compliance and audit requirements?',opts:['Reports can only be used internally and cannot be shared','Reports provide documented evidence of security monitoring activity across the 12-month data retention period','Reports are only available to Administrators','Reports require Secureworks approval before sharing'],ans:1,exp:'Taegis XDR reports leverage the 12-month data lake to produce documented evidence of security monitoring activity — valuable for audit and compliance demonstrations.'},
+  ]},
+  {id:'PLY-01',track:'playbooks',title:'Introduction to XDR Playbooks',questions:[
+    {q:'What is a Taegis XDR Playbook?',opts:['A written document that analysts read during an incident','An automated workflow that triggers actions based on defined conditions in the XDR platform','A manual checklist of response steps','A scheduled report generated from Advanced Search'],ans:1,exp:'A Taegis XDR Playbook is an automated workflow that triggers defined actions — such as notifications, case creation, or response actions — based on conditions like detection severity.'},
+    {q:'Which of the following is a valid Playbook action type in Taegis XDR?',opts:['Automatically update user passwords','Send a notification or create a case based on a detection trigger','Archive all events older than 30 days','Export data to an external database'],ans:1,exp:'Playbook actions include notifications, case creation, response actions (isolate, block), and enrichment — enabling automation of repeatable security workflows.'},
+    {q:'Before enabling a new Playbook in production, what should be done first?',opts:['Get written approval from Secureworks','Deploy it on all endpoints simultaneously','Test the Playbook in a controlled manner to verify it behaves as expected','Enable it immediately to catch threats faster'],ans:2,exp:'Testing the Playbook before production enablement ensures it triggers correctly and performs the right actions — preventing unintended consequences.'},
+  ]},
+  {id:'PLY-02',track:'playbooks',title:'Building a playbook',questions:[
+    {q:'Which trigger type would cause a Playbook to execute immediately when a critical-severity detection is generated?',opts:['Time-based trigger','Generic','Platform','User Initiated'],ans:2,exp:'The Platform trigger type fires the Playbook in response to platform events such as a critical-severity detection being generated — enabling immediate automated response.'},
+    {q:'In a Playbook, what is the purpose of adding a "condition" step?',opts:['To slow down the Playbook for review','To filter which detections or cases the Playbook should act on — for example, by detection type or asset tag','To add a human approval step before any action','To log the Playbook run to an external SIEM'],ans:1,exp:'Conditions in a Playbook filter which events trigger downstream actions — for example, only acting on detections of a specific type or targeting assets with specific tags.'},
+    {q:'What Playbook action would you configure to automatically contain an endpoint when a high-severity detection fires?',opts:['Create a case','Send a Slack notification','Isolate endpoint','Generate an Advanced Search report'],ans:2,exp:'The Isolate Endpoint action is the appropriate Playbook action for automatically containing an endpoint in response to a high-severity detection.'},
+  ]},
+  {id:'PLY-03',track:'playbooks',title:'Connections & integrations',questions:[
+    {q:'What are XDR Connections in the context of Taegis XDR Playbooks?',opts:['VPN tunnels between the XDR platform and customer networks','Pre-built connectors that allow Playbooks to interact with third-party tools and platforms','Direct integrations with the CTU threat intelligence feed','Links between the XDR platform and the Sophos Agent'],ans:1,exp:'XDR Connections are pre-built connectors enabling Playbooks to interact with third-party platforms for integrated automation.'},
+    {q:'What is the best use case for API-based custom integrations in Taegis XDR Playbooks?',opts:['Connecting to collaboration platforms already covered by pre-built connectors','Integrating with bespoke or internally built business tools that lack a pre-built XDR connector','Replacing the Sophos Agent with an API call','Bypassing the Playbook trigger mechanism'],ans:1,exp:'API-based custom integrations are used when a pre-built connector does not exist — allowing Playbooks to connect with bespoke or niche business tools.'},
+    {q:'Why might a team configure a notification platform connection within their Taegis XDR Playbooks?',opts:['To archive old cases automatically','To receive real-time alerts in their collaboration tools when a detection or case is created','To export all events to an external SIEM','To configure SSO for the platform'],ans:1,exp:'Connecting notification platforms to Playbooks enables the team to receive real-time alerts directly in their existing communication channels.'},
+  ]},
+  {id:'PLY-04',track:'playbooks',title:'Automatic case creation rules',questions:[
+    {q:'What severity level is the minimum threshold typically configured for automatic case creation in Taegis XDR?',opts:['Low severity','Informational only','Medium severity','Critical severity only'],ans:2,exp:'Automatic case creation is typically configured for medium severity and above (including custom detections), ensuring significant threats are tracked without creating cases for every low-level alert.'},
+    {q:'In an automatic case creation template, what information is pre-configured?',opts:['The full investigation findings','Assignee, priority, tags, and description template','The raw log data from the detection','The response actions to be taken'],ans:1,exp:'Case templates define the default assignee, priority level, tags, and description format applied to auto-created cases — ensuring consistency and fast assignment.'},
+    {q:'What is the most important consideration before enabling automatic case creation rules?',opts:['Ensuring all Playbooks are disabled first','Confirming the MDR team has approved the template','Making sure detection thresholds are properly tuned so cases are created for genuine threats','Setting the case assignee to Administrator'],ans:2,exp:'Ensuring detection thresholds are properly tuned before enabling automation prevents case overload from false positives.'},
+  ]},
+  {id:'PLY-05',track:'playbooks',title:'Playbook governance & review',questions:[
+    {q:'What is the recommended review cadence for stable, well-established Playbooks in Taegis XDR?',opts:['Daily','Weekly','Quarterly','Annually'],ans:2,exp:'Stable Playbooks should be reviewed quarterly to ensure they remain relevant and accurate as the environment and threat landscape evolve.'},
+    {q:'Why is documenting a Playbook\'s intent and expected behavior important?',opts:['It is required by Secureworks before activation','It enables team members to understand what the Playbook does and troubleshoot unexpected behavior','Documentation is only needed for Playbooks that send notifications','It replaces the need to test the Playbook'],ans:1,exp:'Documentation ensures any team member can understand the Playbook\'s purpose, expected behavior, and logic — supporting troubleshooting, auditing, and knowledge transfer.'},
+    {q:'What is the purpose of version control for Taegis XDR Playbooks?',opts:['To limit who can view the Playbook','To track changes over time, understand what changed and when, and roll back if needed','To publish the Playbook to all tenants automatically','To export the Playbook to a PDF'],ans:1,exp:'Version control tracks changes to Playbooks over time — supporting rollback, audit trails, and change management governance.'},
+  ]},
+  {id:'PRS-01',track:'parsers',title:'XDR data architecture',questions:[
+    {q:'In the Taegis XDR parsing pipeline, what happens to a raw log after the parser processes it?',opts:['It is deleted to save storage','It becomes a normalized event in a standardized schema, which is then available to detectors','It is sent back to the source system for verification','It is encrypted and stored without further processing'],ans:1,exp:'After parsing, the raw log is transformed into a normalized event in a standardized schema — then made available to Taegis XDR detectors for threat identification.'},
+    {q:'Which ingestion path would be used to pull logs from a cloud-based SaaS application that supports API connectivity?',opts:['On-premises XDR Collector via syslog','API-based cloud connector','Sophos Agent telemetry','Manual CSV import'],ans:1,exp:'Cloud-based SaaS applications with API support use API-based cloud connectors to send log data directly to Taegis XDR.'},
+    {q:'Why is understanding the target schema\'s required fields critical before writing a custom parser?',opts:['Schema field names are used as the parser\'s file name','Required fields must be populated for the normalized event to be usable by Taegis XDR detectors','Schema fields determine the color coding in the Events dashboard','Required fields define the case priority level'],ans:1,exp:'Each schema has required fields that detectors depend on. If required fields are missing, the normalized event will not feed correctly into detection logic.'},
+  ]},
+  {id:'PRS-02',track:'parsers',title:'Custom parser fundamentals',questions:[
+    {q:'What is the primary technique used in a custom parser to extract a specific field value from an unstructured log line?',opts:['SQL query execution','Regex pattern matching','Manual copy-paste from the raw log','Machine learning classification'],ans:1,exp:'Regex (regular expression) pattern matching is the primary technique for extracting specific field values from unstructured or semi-structured log lines in a custom parser.'},
+    {q:'After extracting a value from a raw log, what must the parser do with it to make it usable by Taegis XDR detectors?',opts:['Store it in a separate database','Map it to the corresponding standard schema field','Export it to an external SIEM for further processing','Return it to the originating system'],ans:1,exp:'Extracted values must be mapped to the corresponding standard XDR schema fields — this is what transforms raw data into a normalized event that detectors can act on.'},
+    {q:'What is the purpose of a conditional transformation within a custom parser?',opts:['To skip all log lines that do not match a specific source IP','To apply different field mappings or value transformations based on the content of the log','To convert the parser code to a different programming language','To delete log lines that have already been parsed'],ans:1,exp:'Conditional transformations allow a parser to handle log lines differently based on their content — for example, applying different field mappings for different log subtypes.'},
+  ]},
+  {id:'PRS-03',track:'parsers',title:'Developing a custom parser',questions:[
+    {q:'What is the correct first step when starting development of a custom parser for a new log source?',opts:['Write the extraction patterns immediately','Submit the parser to Secureworks for approval','Identify the data source and gather representative sample log lines','Select the target schema before reviewing any log data'],ans:2,exp:'The correct first step is identifying the data source and gathering representative sample log lines — you need real examples to understand the log format before writing extraction patterns.'},
+    {q:'When selecting a target schema for your custom parser, what should guide the choice?',opts:['The schema with the fewest required fields','The schema whose fields best match the data and use case — e.g. Auth for login events, Process for execution data','Always use the HTTP schema as a default','The schema used by the most similar existing integration'],ans:1,exp:'The target schema should be chosen based on the data type and intended use case — Auth for authentication events, Process for execution chains, DNS for domain data, etc.'},
+    {q:'After a custom parser has been written and tested, what is the final step before it begins normalizing live data?',opts:['Email the parser code to Secureworks support','Submit and version the parser within the Taegis XDR platform','Deploy the parser to all endpoints via the Sophos Agent','Convert the parser to JSON format for ingestion'],ans:1,exp:'The final step is submitting the parser within the Taegis XDR platform, where it is versioned and activated to begin normalizing incoming log data.'},
+  ]},
+  {id:'PRS-04',track:'parsers',title:'Testing & validation',questions:[
+    {q:'What is used as input when unit testing a custom parser in Taegis XDR?',opts:['Live production log data only','Sample log lines uploaded to the parser testing interface','A Secureworks-provided synthetic test dataset','The output of an existing Advanced Search query'],ans:1,exp:'Sample log lines are uploaded to the parser testing interface — this allows the parser to be validated against representative data before processing live logs.'},
+    {q:'Which of the following is a common parser error that would cause a field to be missing from the normalized output?',opts:['The log source sending too much data','A regex pattern that does not match the actual log format, leaving a required field unextracted','The XDR Collector being offline during testing','A case with the same name already existing in the platform'],ans:1,exp:'A regex pattern that does not correctly match the log format will fail to extract the field value, leaving required schema fields empty in the normalized output.'},
+    {q:'What does "iterative testing" mean in the context of custom parser development?',opts:['Running the same test once and accepting the result','Running the parser in production first, then fixing errors','Testing, identifying issues, fixing the parser, and testing again repeatedly until output meets schema requirements','Letting Secureworks run all tests on your behalf'],ans:2,exp:'Iterative testing means: test → identify issues → fix → re-test — repeating this cycle until the parser consistently produces correct, schema-compliant normalized output.'},
+  ]},
+  {id:'PRS-05',track:'parsers',title:'Custom detection rules',questions:[
+    {q:'What is the difference between a detection rule and a suppression rule in Taegis XDR?',opts:['Detection rules archive old events; suppression rules create new cases','Detection rules generate alerts when conditions are met; suppression rules prevent specific events from generating alerts','Detection rules only apply to endpoint data; suppression rules only apply to network data','They are identical — the terms are interchangeable'],ans:1,exp:'Detection rules trigger alerts when defined conditions are found in the data. Suppression rules prevent specific known-benign events from generating alerts, reducing noise.'},
+    {q:'What tool within Taegis XDR is used to validate custom detection rule logic against real tenant data?',opts:['The Cases dashboard','The Integration settings page','Advanced Search','The Playbook builder'],ans:2,exp:'Advanced Search is used to validate detection rule logic — running the rule query against real tenant data to confirm it correctly identifies the intended events.'},
+    {q:'Why should custom rules be reviewed with Secureworks before being deployed to production?',opts:['Secureworks charges a fee to activate custom rules','Secureworks must manually write all custom rules','Secureworks review ensures rules follow best practices and are optimized for performance and accuracy','Custom rules are always automatically certified upon submission'],ans:2,exp:'Working with Secureworks to review custom rules ensures they follow best practices, won\'t conflict with existing detections, and are optimized for platform performance.'},
+  ]},
+];
+
+// ── STATE ────────────────────────────────────────────────
+let userName = '', userRole = '';
+let currentTrack = 'admin';
+let currentModIdx = 0;
+let currentQIdx = 0;
+let selectedAnswers = [], quizLocked = [];
+let completedMods = {}; // { modId: { score, total, passed } }
+
+// ── HELPERS ──────────────────────────────────────────────
+function $(id){ return document.getElementById(id); }
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+function showToast(msg, type=''){
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+function updateProgress(){
+  const done = Object.keys(completedMods).length;
+  const chip = $('top-progress');
+  chip.style.display = 'block';
+  chip.textContent = `${done} / ${MODULES.length} modules complete`;
+}
+
+// ── WELCOME → SESSION START ──────────────────────────────
+function startSession(){
+  userName = $('inp-name').value.trim();
+  userRole = $('inp-role').value.trim();
+  if (!userName){ showToast('Please enter your name to continue.'); return; }
+  if (!userRole){ showToast('Please enter your role to continue.'); return; }
+  $('sel-greeting').textContent = `Hi, ${userName.split(' ')[0]}! 👋`;
+  updateProgress();
+  renderModuleList();
+  showScreen('screen-select');
+}
+
+// ── TRACK + MODULE SELECTION ─────────────────────────────
+function selectTrack(track, el){
+  currentTrack = track;
+  document.querySelectorAll('.track-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderModuleList();
+}
+
+const COLORS = { admin:'#1B3A6B', analyst:'#0F6E56', search:'#854F0B', playbooks:'#534AB7', parsers:'#993C1D' };
+const BG = { admin:'#E6F1FB', analyst:'#E1F5EE', search:'#FAEEDA', playbooks:'#EEEDFE', parsers:'#FAECE7' };
+
+function renderModuleList(){
+  const mods = MODULES.filter(m => m.track === currentTrack);
+  const c = COLORS[currentTrack], bg = BG[currentTrack];
+  $('module-list').innerHTML = mods.map(m => {
+    const sc = completedMods[m.id];
+    const doneClass = sc ? ' done' : '';
+    const scoreHtml = sc
+      ? `<span class="mod-score ${sc.passed ? 'pass' : 'fail'}">${sc.score}/3 ${sc.passed ? '✓ Pass' : '✗ Fail'}</span>`
+      : `<span style="font-size:11px;color:#6C757D">${m.questions.length} questions</span>`;
+    return `<div class="mod-item${doneClass}" onclick="startQuiz(${MODULES.indexOf(m)})">
+      <span class="mod-id-badge" style="background:${bg};color:${c}">${m.id}</span>
+      <span class="mod-item-title">${m.title}</span>
+      ${scoreHtml}
+    </div>`;
+  }).join('');
+}
+
+// ── QUIZ ─────────────────────────────────────────────────
+function startQuiz(idx){
+  currentModIdx = idx;
+  currentQIdx = 0;
+  const mod = MODULES[idx];
+  selectedAnswers = new Array(mod.questions.length).fill(-1);
+  quizLocked = new Array(mod.questions.length).fill(false);
+  $('q-title').textContent = `${mod.id}: ${mod.title}`;
+  $('q-sub').textContent = `${TRACKS[mod.track].label}  ·  ${mod.questions.length} questions  ·  Pass mark 2/3`;
+  renderQ();
+  showScreen('screen-quiz');
+}
+
+function renderQ(){
+  const mod = MODULES[currentModIdx];
+  const q = mod.questions[currentQIdx];
+  const total = mod.questions.length;
+  $('prog-fill').style.width = ((currentQIdx + 1) / total * 100) + '%';
+  $('btn-prev').disabled = currentQIdx === 0;
+  $('btn-next').textContent = currentQIdx === total - 1 ? 'Submit Quiz' : 'Next →';
+  const locked = quizLocked[currentQIdx];
+  const sel = selectedAnswers[currentQIdx];
+  let html = `<div class="q-card">
+    <div class="q-num">Question ${currentQIdx + 1} of ${total}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="options">`;
+  q.opts.forEach((opt, i) => {
+    let cls = 'option';
+    if(locked){ if(i === q.ans) cls += ' correct'; else if(i === sel && i !== q.ans) cls += ' wrong'; }
+    else if(i === sel) cls += ' selected';
+    html += `<div class="${cls}${locked?' locked':''}" onclick="${locked?'':'selectOpt('+i+')'}">
+      <span class="opt-letter">${['A','B','C','D'][i]}</span>${opt}
+    </div>`;
+  });
+  html += `</div><div class="explanation${locked?' show':''}">${q.exp}</div></div>`;
+  $('q-container').innerHTML = html;
+}
+
+function selectOpt(i){ selectedAnswers[currentQIdx] = i; renderQ(); }
+function prevQ(){ if(currentQIdx > 0){ currentQIdx--; renderQ(); } }
+
+function nextQ(){
+  if(selectedAnswers[currentQIdx] === -1){ showToast('Please select an answer first.'); return; }
+  quizLocked[currentQIdx] = true;
+  renderQ();
+  const mod = MODULES[currentModIdx];
+  if(currentQIdx < mod.questions.length - 1){
+    setTimeout(() => { currentQIdx++; renderQ(); }, 550);
+  } else {
+    setTimeout(showResult, 700);
+  }
+}
+
+function showResult(){
+  const mod = MODULES[currentModIdx];
+  let score = 0;
+  mod.questions.forEach((q, i) => { if(selectedAnswers[i] === q.ans) score++; });
+  const passed = score >= 2;
+  completedMods[mod.id] = { score, total: mod.questions.length, passed };
+  updateProgress();
+
+  $('res-score').textContent = `${score}/${mod.questions.length}`;
+  $('res-score').style.color = passed ? 'var(--green)' : 'var(--red)';
+  const badge = $('res-badge');
+  badge.textContent = passed ? '✓ Passed' : '✗ Did not pass';
+  badge.className = 'result-badge ' + (passed ? 'pass' : 'fail');
+  $('res-msg').textContent = passed ? 'Well done! You have a solid understanding of this module.' : 'Review the module content and try again to strengthen your knowledge.';
+  $('res-sub').textContent = passed ? 'Your result is being saved. Move on to the next module.' : 'Pass mark is 2 out of 3 correct answers.';
+  $('submit-status').textContent = 'Submitting result to Airtable…';
+  $('submit-status').className = 'submit-status';
+  showScreen('screen-result');
+  submitToAirtable(mod, score, passed);
+}
+
+// ── AIRTABLE SUBMISSION ──────────────────────────────────
+async function submitToAirtable(mod, score, passed){
+  const statusEl = $('submit-status');
+  if(!AIRTABLE_TOKEN){
+    statusEl.textContent = '⚠ Token not configured — result not saved to Airtable.';
+    statusEl.className = 'submit-status err';
+    return;
+  }
+  const now = new Date().toISOString();
+  const uid = `${mod.id}-${Date.now()}`;
+  const body = {
+    records: [{
+      fields: {
+        [F.resultId]:   uid,
+        [F.name]:       userName,
+        [F.role]:       userRole,
+        [F.moduleId]:   mod.id,
+        [F.modTitle]:   mod.title,
+        [F.track]:      TRACKS[mod.track].label,
+        [F.score]:      score,
+        [F.total]:      mod.questions.length,
+        [F.result]:     passed ? 'Pass' : 'Fail',
+        [F.submittedAt]: now,
+      }
+    }]
+  };
+  try {
+    const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${RESULTS_TABLE}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if(res.ok){
+      statusEl.textContent = '✓ Result saved to Airtable successfully.';
+      statusEl.className = 'submit-status ok';
+    } else {
+      const err = await res.json();
+      statusEl.textContent = `⚠ Airtable error: ${err.error?.message || res.status}`;
+      statusEl.className = 'submit-status err';
+    }
+  } catch(e) {
+    statusEl.textContent = `⚠ Could not reach Airtable. Check your connection.`;
+    statusEl.className = 'submit-status err';
+  }
+}
+
+function retake(){ startQuiz(currentModIdx); }
+function goBack(){
+  renderModuleList();
+  showScreen('screen-select');
+}
+</script>
+</body>
+</html>
