@@ -103,9 +103,41 @@
     .wrap{padding:16px}
     .nav{padding:0 16px}
   }
+
+  /* PASSWORD SCREEN */
+  #pass-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F0F4F8}
+  .pass-card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--gray-200);box-shadow:0 4px 24px rgba(0,0,0,.10);padding:48px 40px;width:100%;max-width:400px;text-align:center}
+  .pass-logo{font-size:13px;font-weight:700;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  .pass-logo span{color:var(--gray-500);font-weight:400}
+  .pass-title{font-size:20px;font-weight:600;color:var(--gray-900);margin-bottom:6px;margin-top:16px}
+  .pass-sub{font-size:13px;color:var(--gray-500);margin-bottom:28px;line-height:1.5}
+  .pass-label{display:block;font-size:12px;font-weight:500;color:var(--gray-700);text-align:left;margin-bottom:6px}
+  .pass-input{width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:14px;outline:none;transition:border-color .15s;color:var(--gray-900)}
+  .pass-input:focus{border-color:var(--blue-mid)}
+  .pass-btn{width:100%;margin-top:14px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);padding:11px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+  .pass-btn:hover{background:#15305a}
+  .pass-error{margin-top:12px;font-size:12px;color:var(--red);background:var(--red-light);padding:8px 12px;border-radius:var(--radius);display:none}
+  .pass-icon{font-size:40px;margin-bottom:4px}
 </style>
 </head>
 <body>
+
+<!-- PASSWORD SCREEN -->
+<div id="pass-screen">
+  <div class="pass-card">
+    <div class="pass-icon">🔒</div>
+    <div class="pass-logo">TAEGIS XDR <span>Training Dashboard</span></div>
+    <div class="pass-title">Admin Access Only</div>
+    <div class="pass-sub">This dashboard is restricted to authorised administrators. Please enter the password to continue.</div>
+    <label class="pass-label" for="pass-input">Password</label>
+    <input class="pass-input" type="password" id="pass-input" placeholder="Enter password…" autocomplete="current-password">
+    <button class="pass-btn" onclick="checkPass()">Access Dashboard →</button>
+    <div class="pass-error" id="pass-error">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<!-- MAIN DASHBOARD (hidden until authenticated) -->
+<div id="main-content" style="display:none">
 
 <nav class="nav">
   <div class="nav-inner">
@@ -172,7 +204,8 @@
   <div class="ts" id="ts"></div>
   <div class="footer">Taegis XDR Training Programme · Admin Dashboard · Trainer Confidential</div>
 
-</div>
+</div><!-- /wrap -->
+</div><!-- /main-content -->
 
 <script>
 // ─── CONFIG ─────────────────────────────────────────────────────────────────
@@ -347,7 +380,35 @@ function csv() {
   a.click();
 }
 
-load();
+// ── PASSWORD PROTECTION ──────────────────────────────────
+const PASS = 'password protect the dashboard';
+
+function checkPass() {
+  const val = document.getElementById('pass-input').value;
+  if (val === PASS) {
+    document.getElementById('pass-screen').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    sessionStorage.setItem('tgx_auth', '1');
+    load();
+  } else {
+    const err = document.getElementById('pass-error');
+    err.style.display = 'block';
+    document.getElementById('pass-input').value = '';
+    document.getElementById('pass-input').focus();
+    setTimeout(() => err.style.display = 'none', 3000);
+  }
+}
+
+document.getElementById('pass-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') checkPass();
+});
+
+// Check if already authenticated this session
+if (sessionStorage.getItem('tgx_auth') === '1') {
+  document.getElementById('pass-screen').style.display = 'none';
+  document.getElementById('main-content').style.display = 'block';
+  load();
+}
 </script>
 </body>
 </html>
