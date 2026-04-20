@@ -166,6 +166,7 @@
     <button class="tab active" onclick="st('r',this)">📋 All Results</button>
     <button class="tab" onclick="st('p',this)">👤 By Participant</button>
     <button class="tab" onclick="st('m',this)">📚 By Module</button>
+    <button class="tab" onclick="st('s',this)">📅 Schedule</button>
   </div>
 
   <!-- ALL RESULTS -->
@@ -200,6 +201,9 @@
   <div class="panel" id="panel-m">
     <div class="card"><div class="t-wrap" id="tm"></div></div>
   </div>
+
+  <!-- SCHEDULE PANEL -->
+  <div class="panel" id="panel-s"></div>
 
   <div class="ts" id="ts"></div>
   <div class="footer">Taegis XDR Training Programme · Admin Dashboard · Trainer Confidential</div>
@@ -247,6 +251,7 @@ function st(t, el) {
   $('panel-'+t).classList.add('active');
   if (t==='p') rp();
   if (t==='m') rm();
+  if (t==='s') rs();
 }
 
 async function load() {
@@ -407,6 +412,179 @@ function rm() {
     h+=`</tbody></table></div>`;
   });
   $('tm').innerHTML=h;
+}
+
+// ── SCHEDULE TAB ─────────────────────────────────────────
+function rs() {
+  const URL2 = "https://sophosapps-my.sharepoint.com/personal/ismail_jaweed_sophos_com/_layouts/15/stream.aspx?id=%2Fpersonal%2Fismail%5Fjaweed%5Fsophos%5Fcom%2FDocuments%2FRecordings%2FTaegis%20XDR%20Training%20%2D%20Internal%20Teams%2D20260415%5F182737%2DMeeting%20Recording%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E5c7e7d2d%2D47e4%2D4853%2D8c12%2D74b866506adb";
+  const URL3 = "https://sophosapps-my.sharepoint.com/personal/ismail_jaweed_sophos_com/_layouts/15/stream.aspx?id=%2Fpersonal%2Fismail%5Fjaweed%5Fsophos%5Fcom%2FDocuments%2FRecordings%2FTaegis%20XDR%20Training%20%2D%20Internal%20Teams%2D20260416%5F170125%2DMeeting%20Recording%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2Ebacd09b4%2Df780%2D47f1%2Db97d%2Daf6d5a4fd15c";
+  const URL4 = "https://sophosapps-my.sharepoint.com/personal/ismail_jaweed_sophos_com/_layouts/15/stream.aspx?id=%2Fpersonal%2Fismail%5Fjaweed%5Fsophos%5Fcom%2FDocuments%2FRecordings%2FTaegis%20XDR%20Training%20%2D%20Internal%20Teams%2D20260417%5F170041%2DMeeting%20Recording%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E8e3b8a5c%2De038%2D47b5%2D90bc%2D06f176a43b88";
+
+  const SESSIONS = [
+    {
+      day: 1,
+      date: 'Tuesday, 14 April 2026',
+      time: '5:00 PM – 6:30 PM IST',
+      recorded: false,
+      recordingUrl: null,
+      tracks: [{ id:'T1', label:'Track 1 — Administrator', color:'1B3A6B', lcolor:'E6F1FB', ltxt:'1B3A6B' }],
+      modules: [
+        { id:'ADM-01', title:'Platform overview & navigation' },
+        { id:'ADM-02', title:'User management & roles' },
+        { id:'ADM-03', title:'SSO configuration' },
+        { id:'ADM-04', title:'Integration setup' },
+        { id:'ADM-05', title:'Notification settings' },
+        { id:'ADM-06', title:'Proactive response configuration' },
+      ],
+      topics: [
+        'ADM-01 — XDR Dashboard and Detection Triage Dashboard navigation',
+        'ADM-02 — User invitation, role assignment (Admin, Analyst, Responder, Auditor) and principle of least privilege',
+        'ADM-03 — SSO configuration and backup admin account best practice',
+        'ADM-04 — Sophos Agent deployment, XDR Collector setup, cloud and third-party integrations',
+        'ADM-05 — Operational and escalation notification configuration',
+        'ADM-06 — Proactive response actions and MDR SOC pre-authorisation',
+      ],
+    },
+    {
+      day: 2,
+      date: 'Wednesday, 15 April 2026',
+      time: '5:00 PM – 6:30 PM IST',
+      recorded: true,
+      recordingUrl: URL2,
+      recordingLabel: 'Recap: Taegis XDR Training · 15 April',
+      tracks: [{ id:'T2', label:'Track 2 — Security Analyst', color:'0F6E56', lcolor:'E1F5EE', ltxt:'0F6E56' }],
+      modules: [
+        { id:'ANA-01', title:'Platform orientation for analysts' },
+        { id:'ANA-02', title:'Understanding events & detections' },
+        { id:'ANA-03', title:'Detection triage workflow' },
+        { id:'ANA-04', title:'Cases & investigations' },
+        { id:'ANA-05', title:'Threat intelligence & CTU feeds' },
+        { id:'ANA-06', title:'Ask an expert' },
+        { id:'ANA-07', title:'Response recommendations & escalation' },
+      ],
+      topics: [
+        'ANA-01 — Analyst workspace: Events, Detections, Cases and Advanced Search navigation',
+        'ANA-02 — Detection anatomy: severity, threat score, MITRE ATT&CK mapping and CTU enrichment',
+        'ANA-03 — Triage workflow: Resolve Detection, assign, suppression rules',
+        'ANA-04 — Case creation, evidence documentation and resolution notes',
+        'ANA-05 — CTU feed enrichment within detection details',
+        'ANA-06 — Ask an Expert: chat vs support ticket and context best practice',
+        'ANA-07 — Response actions: isolate, block, quarantine and MDR escalation',
+      ],
+    },
+    {
+      day: 3,
+      date: 'Thursday, 16 April 2026',
+      time: '5:00 PM – 6:30 PM IST',
+      recorded: true,
+      recordingUrl: URL3,
+      recordingLabel: 'Recap: Taegis XDR Training · 16 April',
+      tracks: [
+        { id:'T3', label:'Track 3 — Advanced Search & Hunting', color:'854F0B', lcolor:'FAEEDA', ltxt:'854F0B' },
+        { id:'T4', label:'Track 4 — Playbooks & Automations',   color:'534AB7', lcolor:'EEEDFE', ltxt:'534AB7' },
+      ],
+      modules: [
+        { id:'SRH-01', title:'Advanced Search introduction' },
+        { id:'SRH-02', title:'Query language & syntax' },
+        { id:'SRH-03', title:'Schema & data normalization' },
+        { id:'SRH-05', title:'Report creation & widgets' },
+        { id:'PLY-01', title:'Introduction to XDR Playbooks' },
+        { id:'PLY-02', title:'Building a playbook' },
+        { id:'PLY-03', title:'Connections & integrations' },
+        { id:'PLY-04', title:'Automatic case creation rules' },
+        { id:'PLY-05', title:'Playbook governance & review' },
+      ],
+      topics: [
+        'SRH-01 — Advanced Search interface, 12-month data lake and schema overview',
+        'SRH-02 — Query language: FROM, operators (AND/OR/NOT), time filters, wildcards and aggregations',
+        'SRH-03 — Data normalisation pipeline and core schemas (Auth, Process, DNS, NetFlow, HTTP)',
+        'SRH-05 — Report creation, dashboard widgets and scheduled report delivery',
+        'PLY-01 — Playbook structure: triggers, conditions and action types',
+        'PLY-02 — Building a playbook: Platform trigger, conditions and chained actions',
+        'PLY-03 — Connections to Slack, Teams and custom API integrations',
+        'PLY-04 — Automatic case creation rules and severity thresholds',
+        'PLY-05 — Playbook governance, review cadence and documentation',
+      ],
+    },
+    {
+      day: 4,
+      date: 'Friday, 17 April 2026',
+      time: '5:00 PM – 6:30 PM IST',
+      recorded: true,
+      recordingUrl: URL4,
+      recordingLabel: 'Recap: Taegis XDR Training · 17 April',
+      tracks: [{ id:'T5', label:'Track 5 — Custom Parsers', color:'993C1D', lcolor:'FAECE7', ltxt:'993C1D' }],
+      modules: [
+        { id:'PRS-01', title:'XDR data architecture' },
+        { id:'PRS-02', title:'Custom parser fundamentals' },
+        { id:'PRS-03', title:'Developing a custom parser' },
+        { id:'PRS-04', title:'Testing & validation' },
+        { id:'PRS-05', title:'Custom detection rules' },
+      ],
+      topics: [
+        'PRS-01 — Ingestion pipeline: raw log → parser → normalised event → data lake → detection engine',
+        'PRS-02 — Parser fundamentals: regex extraction, named capture groups and field mapping',
+        'PRS-03 — End-to-end custom parser development: source identification, schema targeting and submission',
+        'PRS-04 — Testing workflow: common cases, edge cases, malformed logs and iterative fixing',
+        'PRS-05 — Custom detection rules, suppression rules and the Secureworks review process',
+      ],
+    },
+  ];
+
+  let h = '<div style="display:flex;flex-direction:column;gap:16px;">';
+
+  SESSIONS.forEach(s => {
+    const trackPills = s.tracks.map(t =>
+      `<span style="background:#${t.lcolor};color:#${t.ltxt};font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;margin-right:6px;">${t.label}</span>`
+    ).join('');
+
+    const modBadges = s.modules.map(m =>
+      `<span style="background:var(--gray-100);color:var(--gray-700);font-size:11px;font-weight:600;padding:3px 9px;border-radius:6px;margin:2px;display:inline-block;">${m.id} <span style="font-weight:400;color:var(--gray-500)">${m.title}</span></span>`
+    ).join('');
+
+    const topicRows = s.topics.map(t =>
+      `<li style="font-size:12px;color:var(--gray-700);margin-bottom:5px;line-height:1.5;">${t}</li>`
+    ).join('');
+
+    const recBadge = s.recorded
+      ? `<a href="${s.recordingUrl}" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:8px;background:#1B3A6B;color:#fff;font-size:12px;font-weight:600;padding:9px 18px;border-radius:8px;text-decoration:none;transition:background .15s;"
+           onmouseover="this.style.background='#2980B9'" onmouseout="this.style.background='#1B3A6B'">
+           <span style="font-size:14px;">▶</span> ${s.recordingLabel}
+         </a>`
+      : `<span style="display:inline-flex;align-items:center;gap:6px;background:var(--gray-100);color:var(--gray-500);font-size:12px;font-weight:500;padding:9px 14px;border-radius:8px;">📵 Not recorded</span>`;
+
+    h += `
+    <div style="background:#fff;border-radius:12px;border:1px solid var(--gray-200);box-shadow:var(--shadow);overflow:hidden;">
+
+      <div style="background:var(--blue);padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div style="background:rgba(255,255,255,.15);color:#fff;font-size:13px;font-weight:700;padding:5px 14px;border-radius:6px;white-space:nowrap;">Day ${s.day}</div>
+        <div>
+          <div style="color:#fff;font-size:14px;font-weight:700;">${s.date}</div>
+          <div style="color:#85B7EB;font-size:12px;margin-top:2px;">${s.time}</div>
+        </div>
+        <div style="margin-left:auto;display:flex;flex-wrap:wrap;gap:4px;">${trackPills}</div>
+      </div>
+
+      <div style="padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Modules Covered</div>
+          <div style="margin-bottom:16px;">${modBadges}</div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Topics Covered</div>
+          <ul style="padding-left:16px;margin:0;">${topicRows}</ul>
+        </div>
+
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Session Recording</div>
+          ${recBadge}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  h += '</div>';
+  $('panel-s').innerHTML = h;
 }
 
 function csv() {
