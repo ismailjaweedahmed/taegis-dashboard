@@ -273,6 +273,7 @@ async function load() {
       score:       r.fields['Score']??0,
       total:       r.fields['Total Questions']??3,
       result:      typeof r.fields['Result']==='object'?(r.fields['Result']?.name||''):(r.fields['Result']||''),
+      attempt:     r.fields['Attempt Number']||1,
       submittedAt: r.fields['Submitted At']||'',
     }));
 
@@ -316,6 +317,7 @@ function rr() {
       <td><div class="cp">${r.moduleId}</div><div class="cs">${r.modTitle}</div></td>
       <td><span class="tp ${tc(r.track)}">${ts2(r.track)}</span></td>
       <td><strong style="font-size:14px">${r.score}/${r.total}</strong></td>
+      <td><span class="badge" style="background:${r.attempt===1?'var(--gray-100)':r.attempt===2?'#FFF8E1':'#FFEBEE'};color:${r.attempt===1?'var(--gray-500)':r.attempt===2?'#7D4F00':'var(--red)'}">#${r.attempt}</span></td>
       <td><span class="badge ${r.result==='Pass'?'pass':'fail'}">${r.result||'—'}</span></td>
       <td style="font-size:12px;color:var(--gray-500)">${fmt(r.submittedAt)}</td>
     </tr>`;
