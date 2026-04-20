@@ -214,16 +214,17 @@ const RESULTS_TABLE = 'tblCTQ6HCtAR05l7y';
 
 // Field IDs in the Quiz Results table
 const F = {
-  resultId:   'fldIg1z0AQqgtAlNG',
-  name:       'fldEAXr4OpoytpfP6',
-  role:       'fldxXjSoLQus7Gf8p',
-  moduleId:   'fldOTh7GaxAOn5LTk',
-  modTitle:   'fldFxIxIwI38LmMTM',
-  track:      'fldDdNWwNTy3zIYh2',
-  score:      'fldQZGnjGqXWvWu4t',
-  total:      'fldLq0mohNgZDGbvc',
-  result:     'fldNKOwBKmuknrJgd',
-  submittedAt:'fldMEuJkZiZLuAw4L',
+  resultId:      'fldIg1z0AQqgtAlNG',
+  name:          'fldEAXr4OpoytpfP6',
+  role:          'fldxXjSoLQus7Gf8p',
+  moduleId:      'fldOTh7GaxAOn5LTk',
+  modTitle:      'fldFxIxIwI38LmMTM',
+  track:         'fldDdNWwNTy3zIYh2',
+  score:         'fldQZGnjGqXWvWu4t',
+  total:         'fldLq0mohNgZDGbvc',
+  result:        'fldNKOwBKmuknrJgd',
+  submittedAt:   'fldMEuJkZiZLuAw4L',
+  attemptNumber: 'fld8VUM882mylhudu',
 };
 // ══════════════════════════════════════════════════════════
 
@@ -521,6 +522,25 @@ function showResult(){
 }
 
 // ── AIRTABLE SUBMISSION ──────────────────────────────────
+
+// Count how many times this participant has already attempted this module
+async function getAttemptNumber(participantName, moduleId) {
+  try {
+    const encodedFormula = encodeURIComponent(
+      `AND({Participant Name}="${participantName}",{Module ID}="${moduleId}")`
+    );
+    const url = `https://api.airtable.com/v0/${BASE_ID}/${RESULTS_TABLE}?filterByFormula=${encodedFormula}&fields[]=${F.moduleId}`;
+    const res = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}` }
+    });
+    if (!res.ok) return 1;
+    const data = await res.json();
+    return (data.records ? data.records.length : 0) + 1;
+  } catch(e) {
+    return 1; // default to attempt 1 if query fails
+  }
+}
+
 async function submitToAirtable(mod, score, passed){
   const statusEl = $('submit-status');
   if(!AIRTABLE_TOKEN){
@@ -528,21 +548,30 @@ async function submitToAirtable(mod, score, passed){
     statusEl.className = 'submit-status err';
     return;
   }
+
+  // Show counting message
+  statusEl.textContent = 'Saving result...';
+  statusEl.className = 'submit-status';
+
+  // Get attempt number first
+  const attemptNumber = await getAttemptNumber(userName, mod.id);
+
   const now = new Date().toISOString();
   const uid = `${mod.id}-${Date.now()}`;
   const body = {
     records: [{
       fields: {
-        [F.resultId]:   uid,
-        [F.name]:       userName,
-        [F.role]:       userRole,
-        [F.moduleId]:   mod.id,
-        [F.modTitle]:   mod.title,
-        [F.track]:      TRACKS[mod.track].label,
-        [F.score]:      score,
-        [F.total]:      mod.questions.length,
-        [F.result]:     passed ? 'Pass' : 'Fail',
-        [F.submittedAt]: now,
+        [F.resultId]:      uid,
+        [F.name]:          userName,
+        [F.role]:          userRole,
+        [F.moduleId]:      mod.id,
+        [F.modTitle]:      mod.title,
+        [F.track]:         TRACKS[mod.track].label,
+        [F.score]:         score,
+        [F.total]:         mod.questions.length,
+        [F.result]:        passed ? 'Pass' : 'Fail',
+        [F.submittedAt]:   now,
+        [F.attemptNumber]: attemptNumber,
       }
     }]
   };
@@ -556,7 +585,8 @@ async function submitToAirtable(mod, score, passed){
       body: JSON.stringify(body)
     });
     if(res.ok){
-      statusEl.textContent = '✓ Result saved to Airtable successfully.';
+      const label = attemptNumber === 1 ? '1st attempt' : attemptNumber === 2 ? '2nd attempt' : `${attemptNumber}th attempt`;
+      statusEl.textContent = `✓ Result saved — ${label} recorded.`;
       statusEl.className = 'submit-status ok';
     } else {
       const err = await res.json();
