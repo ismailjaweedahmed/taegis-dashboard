@@ -513,21 +513,23 @@ function rs() {
       recorded: true,
       recordingUrl: URL4,
       recordingLabel: 'Recap: Taegis XDR Training · 17 April',
-      tracks: [{ id:'T5', label:'Track 5 — Custom Parsers', color:'993C1D', lcolor:'FAECE7', ltxt:'993C1D' }],
+      tracks: [
+        { id:'T3', label:'Track 3 — Advanced Search & Hunting', color:'854F0B', lcolor:'FAEEDA', ltxt:'854F0B' },
+        { id:'T4', label:'Track 4 — Playbooks & Automations',   color:'534AB7', lcolor:'EEEDFE', ltxt:'534AB7' },
+      ],
       modules: [
-        { id:'PRS-01', title:'XDR data architecture' },
-        { id:'PRS-02', title:'Custom parser fundamentals' },
-        { id:'PRS-03', title:'Developing a custom parser' },
-        { id:'PRS-04', title:'Testing & validation' },
-        { id:'PRS-05', title:'Custom detection rules' },
+        { id:'PLY-04', title:'Automatic case creation rules' },
+        { id:'PLY-05', title:'Playbook governance & review' },
+        { id:'SRH-05', title:'Report creation & widgets' },
       ],
       topics: [
-        'PRS-01 — Ingestion pipeline: raw log → parser → normalised event → data lake → detection engine',
-        'PRS-02 — Parser fundamentals: regex extraction, named capture groups and field mapping',
-        'PRS-03 — End-to-end custom parser development: source identification, schema targeting and submission',
-        'PRS-04 — Testing workflow: common cases, edge cases, malformed logs and iterative fixing',
-        'PRS-05 — Custom detection rules, suppression rules and the Secureworks review process',
+        'PLY-04 — Automatic case creation rules, severity thresholds and case templates',
+        'PLY-05 — Playbook governance, review cadence and documentation best practice',
+        'SRH-05 — Report creation, dashboard widgets and scheduled report delivery',
+        'Role mapping between Taegis XDR and Sophos Central (Admin, Analyst, Responder, Auditor)',
+        'Training programme wrap-up and follow-up action items',
       ],
+      note: 'Track 5 — Custom Parsers was not covered during this training cycle.',
     },
   ];
 
@@ -553,6 +555,9 @@ function rs() {
            <span style="font-size:14px;">▶</span> ${s.recordingLabel}
          </a>`
       : `<span style="display:inline-flex;align-items:center;gap:6px;background:var(--gray-100);color:var(--gray-500);font-size:12px;font-weight:500;padding:9px 14px;border-radius:8px;">📵 Not recorded</span>`;
+    const noteBanner = s.note
+      ? `<div style="background:#FFF8E1;border:1px solid #FFD54F;border-radius:8px;padding:10px 14px;margin-top:14px;font-size:12px;color:#7D4F00;display:flex;align-items:flex-start;gap:8px;"><span>⚠️</span><span>${s.note}</span></div>`
+      : '';
 
     h += `
     <div style="background:#fff;border-radius:12px;border:1px solid var(--gray-200);box-shadow:var(--shadow);overflow:hidden;">
@@ -578,6 +583,7 @@ function rs() {
         <div>
           <div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Session Recording</div>
           ${recBadge}
+          ${noteBanner}
         </div>
       </div>
     </div>`;
